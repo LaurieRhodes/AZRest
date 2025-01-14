@@ -18,9 +18,9 @@ param(
                 -authHeader    = A hashtable (header) with valid authentication for Azure Management
 
   Example:  
-    
+
              Remove-AzureObject -AuthHeader $authHeader -Apiversions $AzAPIVersions -azobject $azobject
-#> 
+#>
 
 Process  {
      $IDArray = ($id).split("/")
@@ -42,11 +42,10 @@ Process  {
      
      #Resource Groups are a special case without a provider
      if($IDArray.count -eq 5){ $arraykey = "Microsoft.Resources/resourceGroups"}
-     
+
      $uri = "https://management.azure.com/$($id)?api-version=$($apiversions["$($arraykey)"])"
 
     Invoke-RestMethod -Uri $uri -Method DELETE -Headers $authHeader 
 
   }
-
 }

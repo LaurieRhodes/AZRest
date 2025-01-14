@@ -15,7 +15,7 @@ Process  {
   # to validate what the object type is.
   # The last provider element in the string is always the root namespace so we have to find
   # the last 'provider' element
-  
+
    for ($i=0; $i -lt $IDArray.length; $i++) {
 	   if ($IDArray[$i] -eq 'providers'){$provIndex =  $i}
    }
@@ -42,24 +42,21 @@ Process  {
 
  # There are some inconsistent objects that dont have a type property - default to deriving type from the ID
   if ($objecttype -eq $null){ $objecttype = $IDArray[$provIndex + 2]}
-  
-  
+
   #Resource Groups are also a special case without a provider
   if(($IDArray.count -eq 5)-and ($idarray[3] -eq "resourceGroups")){ 
     write-debug "(function Get-AzureObject) IDArray count = 5 setting objecttype = Microsoft.Resources/resourceGroups"
     $objecttype = "Microsoft.Resources/resourceGroups"
   }
 
-
   # Subscriptions are special too
   if(($IDArray[1] -eq 'subscriptions') -and ($idarray.Count -eq 3)){ 
     write-debug "(function Get-AzureObject) IDArray count = 3 setting objecttype = Microsoft.Resources/subscriptions"
   $objecttype = "Microsoft.Resources/subscriptions" }
-  
+
 
   write-debug "(function Get-AzureObject) Array Count = $($idarray.Count )"
-  
-        
+
   # We can now get the correct API version for the object we are dealing with 
   # which is required for the Azure management URI 
  
@@ -82,8 +79,7 @@ Process  {
 
     write-debug "(function Get-AzureObject) obApiversion does not exist"
 
-    # We now know the object type
-  #$objecttype
+  # We now know the object type
   $objecttype  =   $objecttype.SubString(0, $objecttype.LastIndexOf('/'))
   $obApiversion = $($apiversions["$($objecttype)"])
   write-debug "(function Get-AzureObject) API Version derived as $obapiversion  for type $objecttype"
@@ -94,15 +90,43 @@ Process  {
 
   # A new exception for workbooks needing an additional parameter to get content
   # &canFetchContent
-   if ($objecttype -eq "microsoft.insights/workbooks"){ $uri = $uri + '&canFetchContent=true'}
+    if ($objecttype -eq "microsoft.insights/workbooks"){ $uri = $uri + '&canFetchContent=true'}
 
-   $object = Invoke-RestMethod -Uri $uri -Method GET -Headers $authHeader 
-   
-   $object = ConvertTo-CleanAzureObject -azobject $object 
-   
-   return $object
-  }
-
-
-
+    try {
+        $object = Invoke-RestMethod -Uri $uri -Method GET -Headers $authHeader -ErrorAction Stop
+        
+        # Only proceed with conversion if we got a valid object
+        if ($object) {
+            $object = ConvertTo-CleanAzureObject -azobject $object
+            return $object
+        }
+    }
+    catch {
+        $statusCode = $_.Exception.Response.StatusCode.value__
+        $statusDescription = $_.Exception.Response.StatusDescription
+        
+        switch ($statusCode) {
+            404 {
+                Write-Warning "Resource not found: $id"
+                Write-Debug "(function Get-AzureObject) 404 Not Found for URI: $uri"
+                return $null
+            }
+            401 {
+                Write-Warning "Unauthorized access to resource: $id. Please check authentication."
+                Write-Debug "(function Get-AzureObject) 401 Unauthorized for URI: $uri"
+                throw
+            }
+            403 {
+                Write-Warning "Forbidden access to resource: $id. Please check permissions."
+                Write-Debug "(function Get-AzureObject) 403 Forbidden for URI: $uri"
+                throw
+            }
+            default {
+                Write-Warning "Error accessing resource $id. Status code: $statusCode - $statusDescription"
+                Write-Debug "(function Get-AzureObject) Error for URI: $uri - Status: $statusCode $statusDescription"
+                throw
+            }
+        }
+    }
+}
 }

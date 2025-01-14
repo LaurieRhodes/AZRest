@@ -5,11 +5,8 @@ param(
     [parameter( Mandatory = $true)]
     $authHeader,
     [parameter( Mandatory = $true)]
-    $apiversions,
-    [parameter( Mandatory = $false)]
-    [bool]$unescape=$true
+    $apiversions
 )
-
 
 Process  {
     $IDArray = ($azobject.id).split("/")
@@ -18,7 +15,7 @@ Process  {
   # to validate what the object type is.
   # The last provider element in the string is always the root namespace so we have to find
   # the last 'provider' element
-  
+
    for ($i=0; $i -lt $IDArray.length; $i++) {
 	   if ($IDArray[$i] -eq 'providers'){$provIndex =  $i}
    }
@@ -45,23 +42,22 @@ Process  {
   if ($objecttype -eq $null){ $objecttype = $IDArray[$provIndex + 2]}
   #Resource Groups are also a special case without a provider
   if($IDArray.count -eq 5){ $objecttype = "Microsoft.Resources/resourceGroups"}
-   
+
   # We can now get the correct API version for the object we are dealing with 
-  # which is required for the Azure management URI 
+  # which is required for the Azure management URI
   $uri = "https://management.azure.com$($azobject.id)?api-version=$($apiversions["$($objecttype)"])"
-   
+
    # The actual payload of the API request is simply deployed in json
    $jsonbody =  ConvertTo-Json -Depth 50 -InputObject $azobject 
-   
-   if ($unescape -eq $true){
-     # Invoke-RestMethod -Uri $uri -Method PUT -Headers $authHeader -Body $( $jsonbody  | % { [System.Text.RegularExpressions.Regex]::Unescape($_) })   
-    Invoke-RestMethod -Uri $uri -Method PUT -Headers $authHeader -Body $jsonbody  
-   }
-   else  
-   {
-      Invoke-RestMethod -Uri $uri -Method PUT -Headers $authHeader -Body $jsonbody   
-   }
-   
+
+
+ # Escape non-ascii characters
+   $jsonbody = [Regex]::Replace($jsonbody, 
+      '[^\u0000-\u007F]', 
+      {param($m) '\u{0:x4}' -f [int]([char]$m.Value)})
+
+    Invoke-RestMethod -Uri $uri -Method PUT -Headers $authHeader -Body $jsonbody     
+
   }
 
 }

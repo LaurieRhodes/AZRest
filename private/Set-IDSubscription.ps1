@@ -19,9 +19,9 @@ param(
   Example:  
     
           $object = Set-IdSubscription -object $object -Subscription "2be53ae5-6e46-47df-beb9-6f3a795387b8"
-#> 
-    
-    
+#>
+
+
   #Get Id property and split by '/' subscription
     $IdArray = $IdString.split('/')
      
@@ -35,11 +35,10 @@ param(
         $id = "$($id)/$($IdArray[$i])" 
     }
 
-
    $IdString = $id
 
 
   }
      $IdString
- #    }
+
 }

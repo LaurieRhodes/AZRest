@@ -7,12 +7,12 @@ param(
 <#
   Function:  Get-JSONfile
 
-  Purpose:  Transforms a saved Yaml file to a Powershell Hash table
+  Purpose:  Transforms a saved JSON file to a Powershell Hash table
 
   Parameters:   -Path      = The file path for the json file to import.
 
   Example:  
-    
+
             $object = Get-JSONfile `-Path "C:\templates\vmachine.json"
 #>
 
@@ -28,6 +28,5 @@ param(
 
     $AzObject = ConvertTo-HashTable -InputObject $jsonobj
 
-    
     $AzObject
 }

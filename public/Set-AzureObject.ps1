@@ -22,8 +22,7 @@ param(
   Example:  
     
           $object = Set-AzureObject -object $object -Subscription "2be53ae5-6e46-47df-beb9-6f3a795387b8"
-#> 
-
+#>
 
     if ($Subscription){  
       $IdString = Set-IdSubscription -IdString $AzObject.id -Subscription $Subscription 

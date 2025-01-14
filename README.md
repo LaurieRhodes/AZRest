@@ -15,13 +15,13 @@ Import-Module -Name 'AZRest'
 or, download or clone the module files and dynamically import the module from that file location:
 
 ```powershell
- Import-Module "C:\Users\Laurie\Documents\GitHub\AZRest\AZRest.psm1" 
+ Import-Module "C:\<Path to Modules>\AZRest\AZRest.psm1" 
 ```
 
 Tip: If you don't have an unzip utility like 7-Zip installed, using the native Microsoft 'extract' for zip files will mark all scripts as "blocked".  You'll need to clear the blocked tag.  This can be done with PowerShell.
 
 ```powershell
-Get-ChildItem -Path "C:\Users\laurie\Downloads\AZRest-main\" -Recurse | unblock-file -confirm
+Get-ChildItem -Path "C:\<Path to Modules>\AZRest\" -Recurse | unblock-file -confirm
 ```
 
 ### Code Example - Retrieving a single object from Azure
@@ -40,7 +40,7 @@ $outfolder      = 'c:\temp" # where to export my Azure objects to.
 $id = '/subscriptions/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/resourceGroups/xxxxxxxxxxxxxxxx/providers/Microsoft.Insights/dataCollectionRules/my-datacollection-rule'
 
 
-# As an example - use an inteactive authentication rather than the various Service Account options
+# As an example - use an interactive authentication rather than the various Service Account options
 
 $authheader = Get-Header -interactive -Tenant $Tenant  -Scope azure 
 
@@ -58,3 +58,5 @@ $object =  Get-Azureobject -AuthHeader $authHeader -apiversions $AzAPIVersions -
 
 Out-File -FilePath "$($outfolder)\$($object.name).json" -InputObject (convertto-json -InputObject $object -Depth 10) -Force 
 ```
+
+For an alternate approach using PowerShell modules for authentication, please read: [Rethinking the role of Azure PowerShell Modules | Laurie Rhodes.Info](https://www.laurierhodes.info/node/171)

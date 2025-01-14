@@ -15,13 +15,13 @@ function ConvertFrom-CodeVerifier {
 
   Purpose:  Determines code-challenge from code-verifier for Azure Authentication
 
-  Example:  
-    
+  Example:
+
            ConvertFrom-CodeVerifier -Method s256 -codeVerifier XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
   Author  https://gist.github.com/watahani
 #>
-    
+
     process {
         switch($Method){
             "plain" {
@@ -36,9 +36,9 @@ function ConvertFrom-CodeVerifier {
                 $stringAsStream.Position = 0
                 $hash = Get-FileHash -InputStream $stringAsStream | Select-Object Hash
                 $hex = $hash.Hash
-        
+
                 $bytes = [byte[]]::new($hex.Length / 2)
-                    
+
                 For($i=0; $i -lt $hex.Length; $i+=2){
                     $bytes[$i/2] = [convert]::ToByte($hex.Substring($i, 2), 16)
                 }

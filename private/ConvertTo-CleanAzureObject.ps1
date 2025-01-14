@@ -14,7 +14,7 @@ function Convertto-CleanAzureObject(){
 #>
 
 # Remove typical Read Only properties from Azure Objects if they exist
-    
+
 
  foreach($property in $($object.PSObject.properties.name)){
 
@@ -41,8 +41,8 @@ function Convertto-CleanAzureObject(){
      default {} # Considered to be a rw property
   }
 
- } 
-    
+ }
+
 <#
  Different Object types have different Read Only Properties that must be removed if they are to deploy successfully
  There doesnt seem to be a programatic way to discover these so I'm adding them as new object types are tested.
@@ -100,7 +100,6 @@ function Convertto-CleanAzureObject(){
        "microsoft.insights/components" {
        }
        "Microsoft.Insights/scheduledqueryrules" {
-            ($object).PSObject.properties.remove('systemData')
        }
        "Microsoft.Insights/dataCollectionRules" {
             ($object.properties).PSObject.properties.remove('immutableId')  
@@ -109,7 +108,6 @@ function Convertto-CleanAzureObject(){
        "Microsoft.Insights/workbooks" {
        }
        "Microsoft.KeyVault/vaults" {
-            $object.PSObject.properties.remove('systemData')
        }
        "Microsoft.Logic/workflows" {
             ($object.properties).PSObject.properties.remove('endpointsConfiguration')
@@ -164,7 +162,6 @@ function Convertto-CleanAzureObject(){
        }
        "Microsoft.Network/networkSecurityGroups/securityRules" {
        }
-
        # Sentinel
        "Microsoft.OperationsManagement/solutions" {
             if ($object.plan.product -eq "OMSGallery/SecurityInsights"){
@@ -207,7 +204,6 @@ function Convertto-CleanAzureObject(){
             ($object.properties.workspaceCapping).PSObject.properties.remove('quotaNextResetTime')
        }
        "Microsoft.Portal/dashboards" {
-
        }
        "Microsoft.RecoveryServices/vaults" {
 
@@ -235,11 +231,7 @@ function Convertto-CleanAzureObject(){
             }
             
             write-debug " Microsoft.RecoveryServices/vaults clean complete"
-
-
        }
-
-
        "Microsoft.Resources/resourceGroups" {
        }
        "Microsoft.SecurityInsights/alertRules" {
@@ -252,11 +244,8 @@ function Convertto-CleanAzureObject(){
        }
        "Microsoft.Web/connections" {
        }
-
     }
 
 if ($object ){ return $object }else{ return $null}
-
-
 
 }

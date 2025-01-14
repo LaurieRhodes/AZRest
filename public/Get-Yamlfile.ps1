@@ -13,7 +13,6 @@ param(
   Parameters:   -Path      = The file path for the yaml file to import.
 
   Example:  
-    
             $object = Get-Yamlfile `-Path "C:\templates\vmachine.yaml"
 #>
 

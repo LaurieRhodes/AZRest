@@ -14,7 +14,7 @@ param(
                 -Header              = A hashtable (header) with valid authentication for Azure Management
 
   Example:  
-    
+
              Get-AzureAPIVersions = Get-AnalyticsWorkspaceKey `
                                       -Header $header `
                                       -SubscriptionId "ed4ef888-5466-401c-b77a-6f9cd7cc6815" 
